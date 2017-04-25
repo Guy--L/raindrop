@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "raindrop", "raindrop\raindrop.csproj", "{881EFA36-DDCC-40B7-9BC2-28AF080E199C}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "rdb", "rdb\rdb.sqlproj", "{F0316510-327F-4CB3-80F9-4FA8E1245AE1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{881EFA36-DDCC-40B7-9BC2-28AF080E199C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{881EFA36-DDCC-40B7-9BC2-28AF080E199C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{881EFA36-DDCC-40B7-9BC2-28AF080E199C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{881EFA36-DDCC-40B7-9BC2-28AF080E199C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0316510-327F-4CB3-80F9-4FA8E1245AE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0316510-327F-4CB3-80F9-4FA8E1245AE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0316510-327F-4CB3-80F9-4FA8E1245AE1}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{F0316510-327F-4CB3-80F9-4FA8E1245AE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0316510-327F-4CB3-80F9-4FA8E1245AE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0316510-327F-4CB3-80F9-4FA8E1245AE1}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
