@@ -25,20 +25,19 @@ namespace raindrop
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
-            Configuration = builder.Build();
-
-            var dir = Path.Combine(env.WebRootPath, "uploads");
+            Cfg = builder.Build();
+            var dir = Path.Combine(env.ContentRootPath, "uploads");
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfigurationRoot Cfg { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddScoped<IDatabase>(_ => new Rdb(Configuration.GetConnectionString("rdb")));
+            services.AddScoped<IDatabase>(_ => new Rdb(Cfg.GetConnectionString("rdb")));
             services.AddMvc();
             services.AddMvc(properties =>
             {
@@ -49,12 +48,13 @@ namespace raindrop
                 c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
                 c.OperationFilter<FormFileOperationFilter>();
             });
+            services.Configure<LogCentralSettings>(Cfg.GetSection("LogCentral"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddConsole(Cfg.GetSection("Logging"));
             loggerFactory.AddDebug();
 
             app.UseMvc();

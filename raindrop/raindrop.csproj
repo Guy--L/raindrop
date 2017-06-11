@@ -3,11 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <UserSecretsId>9b55531a-c912-485a-b02a-9b9fb5f47984</UserSecretsId>
-    <PackageTargetFallback>portable-net45+win8</PackageTargetFallback>
+    <PackageTargetFallback>portable-net45+win8+net45</PackageTargetFallback>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <Compile Remove="wwwroot\**" />
+    <Content Remove="wwwroot\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="wwwroot\**" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />

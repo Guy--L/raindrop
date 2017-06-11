@@ -19,11 +19,11 @@
     "raindrop": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/values",
+      "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:62916"
+      "applicationUrl": "http://10.211.55.6:62916"
     }
   }
 }

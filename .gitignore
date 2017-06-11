@@ -1,4 +1,4 @@
-﻿###################
+###################
 # compiled source #
 ###################
 *.com
@@ -77,3 +77,4 @@ _[Ss]cripts
 *.ncrunchsolution
 *.dot[Cc]over
 raindrop/wwwroot/uploads/
+raindrop/uploads/
