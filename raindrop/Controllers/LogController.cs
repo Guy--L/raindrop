@@ -99,15 +99,18 @@ namespace raindrop.Controllers
 
             System.IO.File.Delete(archive);
             var logs = Directory.GetFiles(stage);
+            var roll = new List<string>(logs.Length);
             foreach (var log in logs)
             {
                 header.Stamp = DateTime.UtcNow;
 
                 var inserted = _db.Insert(header);
-                var newname = string.Format($"{Path.GetFileName(log)}_{inserted}");
+                var oldname = Path.GetFileName(log);
+                roll.Add(oldname);
+                var newname = string.Format($"{oldname}_{inserted}");
                 System.IO.File.Move(log, Path.Combine(dir, newname));
             }
-            return new OkObjectResult(logs.Length);
+            return new OkObjectResult(roll);
         }
 
         private int ExtractArchive(string source, string destination)
