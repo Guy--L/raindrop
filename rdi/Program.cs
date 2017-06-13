@@ -37,7 +37,9 @@ namespace rdi
                     return;
                 }
 
+                FileStream locker = new FileStream(logs[0], FileMode.Open, FileAccess.Read, FileShare.None);
                 CreateArchive(stg["LogDirectory"], archive);
+                locker.Close();
 
                 var client = new RestClient(stg["Url"]);
                 var request = new RestRequest("log", Method.POST);
@@ -53,7 +55,6 @@ namespace rdi
                 //request.AddHeader("Accept", "application/json");
                 //request.RequestFormat = DataFormat.Json;
 
-                Console.WriteLine("request to start for "+logs.Length+" log(s)");
                 IRestResponse response = client.Execute(request);
                 if (response.ResponseStatus == ResponseStatus.Error)
                 {
@@ -69,12 +70,11 @@ namespace rdi
                     Console.ReadKey();
                     return;
                 }
-
+                Console.WriteLine("uploaded " + response.Content + " log(s)");
                 foreach (var log in logs)
                     File.Delete(log);
 
                 File.Delete(archive);
-                Console.WriteLine("uploaded "+response.Content+" log(s)");
             }
             catch (Exception e)
             {
@@ -86,26 +86,15 @@ namespace rdi
 
         static void CreateArchive(string sourcedir, string archive)
         {
-            string sources = Path.Combine(sourcedir, "*.*");
+            string sources = sourcedir + "\\*";
+
             ProcessStartInfo p = new ProcessStartInfo();
-            p.UseShellExecute = false;
-            p.RedirectStandardError = true;
-            p.RedirectStandardOutput = true;
+            p.CreateNoWindow = true;
             p.FileName = stg["7Zip"];
             p.Arguments = "a -t7z \"" + archive + "\" \"" + sources + "\" -mx=9";
-            p.WindowStyle = ProcessWindowStyle.Hidden;
-            Process x = new Process();
-            x.StartInfo = p;
-            x.ErrorDataReceived += new DataReceivedEventHandler(OutputHandler);
-            //* Start process
-            x.Start();
-            //* Read one element asynchronously
-            x.BeginErrorReadLine();
-            //* Read the other one synchronously
-            string output = x.StandardOutput.ReadToEnd();
-            Console.WriteLine("stdout: "+output);
+            Process x = Process.Start(p);
             x.WaitForExit();
-            var code = x.ExitCode;
+            Console.WriteLine("Exit code is " + x.ExitCode);
         }
 
         static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
