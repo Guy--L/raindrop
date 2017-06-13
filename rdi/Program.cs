@@ -20,6 +20,12 @@ namespace rdi
     class Program
     {
         static NameValueCollection stg;
+        static string _errpath;
+
+        static void ErrorMesg(string msg)
+        {
+            File.AppendAllText(_errpath, DateTime.Now.ToString("yy/MM/dd hh:mm:sss ") + msg + "\n"); 
+        }
 
         static void Main(string[] args)
         {
@@ -27,19 +33,18 @@ namespace rdi
             {
                 stg = ConfigurationManager.AppSettings;
 
-                var logs = Directory.GetFiles(stg["LogDirectory"]);
+                var source = stg["LogDirectory"];
+                _errpath = Path.Combine(source, stg["Errorlog"]);
+
+                var logs = Directory.GetFiles(source);
                 var archive = Path.Combine(Path.GetTempPath(), "tmp"+DateTime.Now.ToString("yyyyMMddhhmmsss")+".7z");
 
                 if (logs.Length == 0)
                 {
-                    Console.WriteLine("No logs found");
-                    Console.ReadKey();
                     return;
                 }
 
-                FileStream locker = new FileStream(logs[0], FileMode.Open, FileAccess.Read, FileShare.None);
-                CreateArchive(stg["LogDirectory"], archive);
-                locker.Close();
+                CreateArchive(source, archive);
 
                 var client = new RestClient(stg["Url"]);
                 var request = new RestRequest("log", Method.POST);
@@ -48,40 +53,32 @@ namespace rdi
 
                 request.AddParameter("DeviceId", stg["DeviceId"]);
                 request.AddFile("file", archive);
-                //var bytes = File.ReadAllBytes(archive);
-                //request.AddFile("file", bytes, Path.GetFileName(archive), "application/octet-stream");
-                
-                //request.AddHeader("Content-type", "application/json");
-                //request.AddHeader("Accept", "application/json");
-                //request.RequestFormat = DataFormat.Json;
 
                 IRestResponse response = client.Execute(request);
                 if (response.ResponseStatus == ResponseStatus.Error)
                 {
-                    Console.WriteLine("net error " + response.ErrorMessage + " " + stg["Url"]);
-                    Console.ReadKey();
+                    ErrorMesg("net error " + response.ErrorMessage + " " + stg["Url"]);
                     return;
                 }
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    Console.WriteLine("response " + response.StatusCode);
+                    ErrorMesg("response " + response.StatusCode);
                     var error = JsonConvert.DeserializeObject<ApiError>(response.Content);
-                    Console.WriteLine("error    " + error.message);
-                    Console.ReadKey();
+                    ErrorMesg("error    " + error.message);
                     return;
                 }
-                Console.WriteLine("uploaded " + response.Content + " log(s)");
-                foreach (var log in logs)
-                    File.Delete(log);
+
+                var confirmed = JsonConvert.DeserializeObject<List<string>>(response.Content);
+                foreach (string log in confirmed)
+                    File.Delete(Path.Combine(source, log));
 
                 File.Delete(archive);
             }
             catch (Exception e)
             {
-                Console.WriteLine("error " + e.Message);
-                Console.WriteLine("stack " + e.StackTrace);
+                ErrorMesg("error " + e.Message);
+                ErrorMesg("stack " + e.StackTrace);
             }
-            Console.ReadKey();
         }
 
         static void CreateArchive(string sourcedir, string archive)
@@ -89,18 +86,13 @@ namespace rdi
             string sources = sourcedir + "\\*";
 
             ProcessStartInfo p = new ProcessStartInfo();
+            p.UseShellExecute = false;
+            p.WindowStyle = ProcessWindowStyle.Hidden;
             p.CreateNoWindow = true;
             p.FileName = stg["7Zip"];
             p.Arguments = "a -t7z \"" + archive + "\" \"" + sources + "\" -mx=9";
             Process x = Process.Start(p);
             x.WaitForExit();
-            Console.WriteLine("Exit code is " + x.ExitCode);
-        }
-
-        static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
-        {
-            //* Do your stuff with the output (write to console/log/StringBuilder)
-            Console.WriteLine(outLine.Data);
         }
     }
 }
