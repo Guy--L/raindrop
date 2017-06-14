@@ -22,7 +22,7 @@ namespace rdi
         static NameValueCollection stg;
         static string _errpath;
 
-        static void ErrorMesg(string msg)
+        public static void ErrorMesg(string msg)
         {
             File.AppendAllText(_errpath, DateTime.Now.ToString("yy/MM/dd hh:mm:sss ") + msg + "\n"); 
         }
@@ -35,6 +35,8 @@ namespace rdi
 
                 var source = stg["LogDirectory"];
                 _errpath = Path.Combine(source, stg["Errorlog"]);
+
+                var deviceid = ReadDeviceId.Get(ConfigurationManager.ConnectionStrings["SupplyAgentDB"].ConnectionString);
 
                 var logs = Directory.GetFiles(source);
                 var archive = Path.Combine(Path.GetTempPath(), "tmp"+DateTime.Now.ToString("yyyyMMddhhmmsss")+".7z");
@@ -51,7 +53,7 @@ namespace rdi
                 request.AddParameter("User.Name", stg["User"]);
                 request.AddParameter("User.Password", stg["Password"]);
 
-                request.AddParameter("DeviceId", stg["DeviceId"]);
+                request.AddParameter("DeviceId", deviceid);
                 request.AddFile("file", archive);
 
                 IRestResponse response = client.Execute(request);
